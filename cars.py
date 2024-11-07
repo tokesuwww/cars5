@@ -235,7 +235,7 @@ def edit_car(db):
         if car.doors is None:
             return
 
-    db.update_car(index, car)  # Update the car in the database
+    db.update_car(index, car)
     print("Информация о машине обновлена!")
 
 def search_cars(db):
@@ -297,14 +297,14 @@ def search_cars(db):
             search_criteria["doors"] = get_input(db.doors, "Выберите состояние дверей:")
             if search_criteria["doors"] is None:
                 return
-        elif choice == 0:  # "Отмена"
+        elif choice == 0:
             return
 
         if input("Хотите добавить ещё параметры поиска? (да/нет): ").lower() != "да":
             break
 
-    found_cars = db.find_cars(**search_criteria)  # Pass search criteria as keyword arguments
-    db.cars = found_cars  # Update the cars list in the database
+    found_cars = db.find_cars(**search_criteria)  
+    db.cars = found_cars
     display_cars(found_cars)
 
 def delete_car(db):
