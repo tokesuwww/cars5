@@ -3,7 +3,7 @@ from tabulate import tabulate
 import os
 
 class Car:
-    def __init__(self, brand, model, color, gearbox, engine, status, headlights, doors):
+    def __init__(self, brand, model, color, gearbox, engine, status, headlights, doors, windows):
         self.brand = brand
         self.model = model
         self.color = color
@@ -12,6 +12,7 @@ class Car:
         self.status = status
         self.headlights = headlights
         self.doors = doors
+        self.windows=windows
 
     def to_dict(self):
         return {
@@ -22,7 +23,8 @@ class Car:
             "engine": self.engine,
             "status": self.status,
             "headlights": self.headlights,
-            "doors": self.doors
+            "doors": self.doors,
+            "windows":self.windows
         }
 
 class CarDatabase:
@@ -45,6 +47,7 @@ class CarDatabase:
         self.statuses = ["Заведена", "Не заведена"]
         self.headlights = ["Включены", "Не включены"]
         self.doors = ["Закрыты", "Открыты"]
+        self.windows = ["Закрыты", "Открыты"]
 
     def load_cars(self):
         try:
@@ -72,7 +75,7 @@ class CarDatabase:
         del self.all_cars[index]
         self.save_cars()
 
-    def find_cars(self, brand=None, model=None, color=None, gearbox=None, engine=None, status=None, headlights=None, doors=None):
+    def find_cars(self, brand=None, model=None, color=None, gearbox=None, engine=None, status=None, headlights=None, doors=None,windows=None):
         results = []
         for car in self.cars:
             match = True
@@ -92,6 +95,8 @@ class CarDatabase:
                 match = False
             if doors is not None and car.doors != doors:
                 match = False
+            if windows is not None and car.windows != windows:
+                match = False
             if match:
                 results.append(car)
         return results
@@ -100,9 +105,9 @@ def clear_console():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def display_cars(cars):
-    headers = ["Марка", "Модель", "Цвет", "КПП", "Двигатель", "Статус", "Фары", "Двери"]
+    headers = ["Марка", "Модель", "Цвет", "КПП", "Двигатель", "Статус", "Фары", "Двери","Окна"]
     table_data = [[
-        car.brand, car.model, car.color, car.gearbox, car.engine, car.status, car.headlights, car.doors
+        car.brand, car.model, car.color, car.gearbox, car.engine, car.status, car.headlights, car.doors, car.windows
     ] for car in cars]
     print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
@@ -156,7 +161,11 @@ def add_car(db):
     if doors is None:
         return
 
-    new_car = Car(brand, model, color, gearbox, engine, status, headlights, doors)
+    windows = get_input(db.windows, "Выберите состояние окон:")
+    if windows is None:
+        return
+
+    new_car = Car(brand, model, color, gearbox, engine, status, headlights, doors,windows)
     db.add_car(new_car)
     print("Машина добавлена!")
 
@@ -188,6 +197,7 @@ def edit_car(db):
     print("6. Статус")
     print("7. Фары")
     print("8. Двери")
+    print("9. Окна")
     print("0. Выход в меню")
 
     while True:
@@ -195,7 +205,7 @@ def edit_car(db):
             choice = int(input("Выберите вариант: "))
             if choice == 0:
                 return
-            elif 1 <= choice <= 8:
+            elif 1 <= choice <= 9:
                 break
             else:
                 print("Неверный выбор. Попробуйте снова.")
@@ -234,6 +244,10 @@ def edit_car(db):
         car.doors = get_input(db.doors, "Выберите состояние дверей:")
         if car.doors is None:
             return
+    elif choice == 9:
+        car.windows = get_input(db.windows, "Выберите состояние окон:")
+        if car.doors is None:
+            return
 
     db.update_car(index, car)
     print("Информация о машине обновлена!")
@@ -251,6 +265,7 @@ def search_cars(db):
         print("6. Статус")
         print("7. Фары")
         print("8. Двери")
+        print("9. Окна")
         print("0. Выход в меню")
 
         while True:
@@ -296,6 +311,10 @@ def search_cars(db):
         elif choice == 8:
             search_criteria["doors"] = get_input(db.doors, "Выберите состояние дверей:")
             if search_criteria["doors"] is None:
+                return
+        elif choice == 9:
+            search_criteria["windows"] = get_input(db.windows, "Выберите состояние окон:")
+            if search_criteria["windows"] is None:
                 return
         elif choice == 0:
             return
